@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>מבזקי חדשות — פאנל ניהול</title>
+  <title>חדשותינו — פאנל ניהול</title>
   <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -604,8 +604,8 @@
 
   <!-- Header -->
   <div class="header">
-    <h1>מבזקי <span>חדשות</span></h1>
-    <p>מערכת ניהול מבזקים לימות המשיח IVR</p>
+    <h1><span>חדשותינו</span></h1>
+    <p>מערכת מבזקי חדשות AI</p>
   </div>
 
   <!-- Status -->
@@ -629,15 +629,11 @@
     <div class="create-section">
       <div class="section-title">
         <div class="icon">⚡</div>
-        פרסום מבזק חדש
-      </div>
-      <div class="form-group">
-        <label>כותרת המבזק</label>
-        <input type="text" id="newsTitle" placeholder="לדוגמה: אזעקות בגוש דן" autocomplete="off">
+        חדשותינו — פרסום מבזק
       </div>
       <div class="form-group">
         <label>תוכן המבזק</label>
-        <textarea id="newsContent" placeholder="הציבור מתבקש להיכנס למרחבים מוגנים"></textarea>
+        <textarea id="newsContent" placeholder="הקלד את תוכן המבזק כאן..." rows="3"></textarea>
       </div>
       <button class="btn btn-primary" id="publishBtn" onclick="publishNews()">
         ⚡ פרסם מבזק
@@ -734,11 +730,10 @@
     }
 
     async function publishNews() {
-      const title = document.getElementById('newsTitle').value.trim();
       const content = document.getElementById('newsContent').value.trim();
 
-      if (!title || !content) {
-        showToast('יש למלא כותרת ותוכן', true);
+      if (!content) {
+        showToast('יש למלא תוכן', true);
         return;
       }
 
@@ -750,11 +745,10 @@
         const res = await fetch(`${API}/api/news`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ title, content })
+          body: JSON.stringify({ content })
         });
 
         if (res.ok) {
-          document.getElementById('newsTitle').value = '';
           document.getElementById('newsContent').value = '';
           showToast('מבזק פורסם בהצלחה! ⚡');
           await fetchNews();

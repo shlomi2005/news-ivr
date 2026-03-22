@@ -44,30 +44,31 @@ app.get('/api/news/all', async (req, res) => {
 // POST /api/news — יצירת מבזק + העלאה אוטומטית לימות המשיח
 app.post('/api/news', async (req, res) => {
   try {
-    const { title, content } = req.body;
-    if (!title || !content) return res.status(400).json({ error: 'חובה למלא כותרת ותוכן' });
+    const { content } = req.body;
+    if (!content) return res.status(400).json({ error: 'חובה למלא תוכן' });
 
     const db = await getDb();
-    db.run(`INSERT INTO news (title, content) VALUES (?, ?)`, [title, content]);
+    db.run(`INSERT INTO news (title, content) VALUES (?, ?)`, [content, content]);
     saveDb();
 
     const result = db.exec('SELECT last_insert_rowid()');
     const newId = result[0].values[0][0];
 
-    // העלאה אוטומטית לימות המשיח כקובץ TTS
+    // העלאה אוטומטית לימות המשיח
     let yemotResult = null;
     try {
       const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')} ${String(now.getMinutes()).padStart(2, '0')}`;
-      const cleanTitle = cleanTextForIVR(title);
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
       const cleanContent = cleanTextForIVR(content);
-      yemotResult = await publishToYemot(cleanTitle, cleanContent, timeStr);
+      const ttsText = `${hours}:${minutes} בחדשותינו ${cleanContent}`;
+      yemotResult = await publishToYemot(ttsText);
       console.log('📞 ימות המשיח:', yemotResult);
     } catch (yemotErr) {
       console.error('⚠️ שגיאה בהעלאה לימות:', yemotErr.message);
     }
 
-    res.status(201).json({ id: newId, title, content, message: 'מבזק פורסם בהצלחה', yemot: yemotResult || { success: false, error: 'לא הצליח להעלות לימות' } });
+    res.status(201).json({ id: newId, content, message: 'מבזק פורסם בהצלחה', yemot: yemotResult || { success: false, error: 'לא הצליח להעלות לימות' } });
   } catch (err) { res.status(500).json({ error: 'שגיאה ביצירת מבזק' }); }
 });
 
