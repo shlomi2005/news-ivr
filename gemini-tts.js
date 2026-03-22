@@ -62,7 +62,7 @@ async function textToSpeech(text) {
       speech_config: {
         voiceConfig: {
           prebuiltVoiceConfig: {
-            voice_name: "Kore"
+            voice_name: "Orus"
           }
         }
       }
