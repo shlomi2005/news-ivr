@@ -103,23 +103,41 @@ function formatTime(dateStr) {
  */
 function buildIVRResponse(newsItems) {
   if (!newsItems || newsItems.length === 0) {
-    return 'id_list_message=t-שלום אין מבזקים חדשים כרגע תודה ולהתראות&go_to_folder=/hangup';
+    return 'id_list_message=t-שלום רב אין מבזקים חדשים כרגע תודה רבה ולהתראות&go_to_folder=/hangup';
   }
 
-  let parts = ['שלום להלן המבזקים האחרונים'];
+  // מילות מעבר בין מבזקים ליצירת הפסקות טבעיות
+  const PAUSE = '                    '; // רווחים ארוכים ליצירת השהייה
+  const transitions = [
+    'וכעת המבזק הבא',
+    'ועוד מבזק',
+    'בנוסף',
+    'וגם',
+    'מבזק נוסף'
+  ];
 
-  for (const item of newsItems) {
+  let parts = [];
+  parts.push(`שלום רב${PAUSE}להלן המבזקים האחרונים${PAUSE}`);
+
+  for (let i = 0; i < newsItems.length; i++) {
+    const item = newsItems[i];
     const time = formatTime(item.created_at);
     const title = cleanTextForIVR(item.title);
     const content = cleanTextForIVR(item.content);
-    parts.push(`מבזק שעה ${time} ${title} ${content}`);
+
+    parts.push(`מבזק שעה ${time}${PAUSE}${title}${PAUSE}${content}`);
+
+    // הוספת מילת מעבר בין מבזקים (לא אחרי האחרון)
+    if (i < newsItems.length - 1) {
+      parts.push(`${PAUSE}${transitions[i % transitions.length]}${PAUSE}`);
+    }
   }
 
-  parts.push('עד כאן המבזקים תודה ולהתראות');
+  parts.push(`${PAUSE}עד כאן המבזקים${PAUSE}תודה רבה ולהתראות`);
 
   const fullText = parts.join(' ');
-  // ניקוי סופי של רווחים כפולים
-  const cleanedText = fullText.replace(/\s+/g, ' ').trim();
+  // ניקוי סופי - שומר על רווחים מרובים לצורך השהייה
+  const cleanedText = fullText.replace(/\s{30,}/g, '                    ').trim();
 
   return `id_list_message=t-${cleanedText}&go_to_folder=/hangup`;
 }
