@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מבזקי חדשות — פאנל ניהול</title>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-2: #1a1a26;
+      --border: #2a2a3a;
+      --accent: #e63946;
+      --accent-glow: rgba(230, 57, 70, 0.3);
+      --accent-2: #ff6b6b;
+      --green: #2ecc71;
+      --green-dim: rgba(46, 204, 113, 0.15);
+      --yellow: #f1c40f;
+      --text: #e8e8ef;
+      --text-dim: #8888a0;
+      --text-muted: #55556a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Ticker Bar */
+    .ticker-bar {
+      background: var(--accent);
+      color: white;
+      padding: 8px 0;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .ticker-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker 30s linear infinite;
+    }
+
+    @keyframes ticker {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* Header */
+    .header {
+      margin-top: 40px;
+      padding: 40px 24px 24px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 2px;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .header h1 span {
+      color: var(--accent);
+    }
+
+    .header p {
+      color: var(--text-dim);
+      font-size: 14px;
+      font-weight: 300;
+    }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      padding: 20px 24px;
+      flex-wrap: wrap;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.offline { background: var(--accent); animation: none; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Main Layout */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 20px 60px;
+    }
+
+    /* Create Form */
+    .create-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title .icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Heebo', sans-serif;
+      font-size: 15px;
+      transition: all 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Heebo', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-2);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-dim);
+      background: transparent;
+      border: none;
+      font-family: 'Heebo', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .tab:hover:not(.active) {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    /* News List */
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .news-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .news-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    .news-card.inactive {
+      opacity: 0.5;
+    }
+
+    .news-card.inactive::before {
+      background: var(--text-muted);
+    }
+
+    .news-card:hover {
+      border-color: var(--accent);
+    }
+
+    .news-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .news-time {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 700;
+      background: rgba(230, 57, 70, 0.1);
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .news-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .news-actions button {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-dim);
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: 'Heebo', sans-serif;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .news-actions button:hover {
+      border-color: var(--text-dim);
+      color: var(--text);
+    }
+
+    .news-actions button.delete:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(230, 57, 70, 0.1);
+    }
+
+    .news-title {
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .news-content {
+      font-size: 14px;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* IVR Preview */
+    .ivr-preview {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-top: 24px;
+    }
+
+    .ivr-output {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 2;
+      color: var(--green);
+      word-break: break-word;
+      direction: ltr;
+      text-align: left;
+      font-family: 'Courier New', monospace;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .ivr-stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ivr-stat {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+
+    .ivr-stat strong {
+      color: var(--accent);
+    }
+
+    /* Endpoints */
+    .endpoints {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .endpoint-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .endpoint-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--accent);
+    }
+
+    .endpoint-url {
+      background: var(--bg);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--green);
+      direction: ltr;
+      text-align: left;
+      word-break: break-all;
+    }
+
+    .endpoint-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state .icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+
+    .empty-state p {
+      font-size: 15px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--green);
+      color: #000;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.error {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Edit Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      width: 100%;
+      max-width: 500px;
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-dim);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-actions .btn {
+      flex: 1;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      justify-content: center;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-dim);
+      color: var(--text);
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header h1 { font-size: 24px; }
+      .status-bar { gap: 12px; }
+      .create-section, .ivr-preview { padding: 20px; }
+      .endpoints { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Ticker -->
+  <div class="ticker-bar">
+    <div class="ticker-content" id="tickerContent">
+      ⚡ מערכת מבזקי חדשות — פעילה ומעודכנת ⚡
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <h1>מבזקי <span>חדשות</span></h1>
+    <p>מערכת ניהול מבזקים לימות המשיח IVR</p>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">מערכת פעילה</span>
+    </div>
+    <div class="status-item">
+      <span>📡</span>
+      <span id="newsCount">0 מבזקים פעילים</span>
+    </div>
+    <div class="status-item">
+      <span>🕐</span>
+      <span id="lastUpdate">טרם עודכן</span>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Create Form -->
+    <div class="create-section">
+      <div class="section-title">
+        <div class="icon">⚡</div>
+        פרסום מבזק חדש
+      </div>
+      <div class="form-group">
+        <label>כותרת המבזק</label>
+        <input type="text" id="newsTitle" placeholder="לדוגמה: אזעקות בגוש דן" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>תוכן המבזק</label>
+        <textarea id="newsContent" placeholder="הציבור מתבקש להיכנס למרחבים מוגנים"></textarea>
+      </div>
+      <button class="btn btn-primary" id="publishBtn" onclick="publishNews()">
+        ⚡ פרסם מבזק
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="list" onclick="switchTab('list')">📋 מבזקים</button>
+      <button class="tab" data-tab="ivr" onclick="switchTab('ivr')">📞 תצוגת IVR</button>
+      <button class="tab" data-tab="api" onclick="switchTab('api')">🔗 Endpoints</button>
+    </div>
+
+    <!-- News List Tab -->
+    <div id="listTab">
+      <div class="news-list" id="newsList"></div>
+    </div>
+
+    <!-- IVR Tab -->
+    <div id="ivrTab" style="display:none">
+      <div class="ivr-preview">
+        <div class="section-title">
+          <div class="icon">📞</div>
+          תצוגת פלט IVR
+        </div>
+        <div class="ivr-output" id="ivrOutput">טוען...</div>
+        <div class="ivr-stats" id="ivrStats"></div>
+      </div>
+    </div>
+
+    <!-- API Tab -->
+    <div id="apiTab" style="display:none">
+      <div class="endpoints" id="endpointsGrid"></div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>עריכת מבזק</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="form-group">
+        <label>כותרת</label>
+        <input type="text" id="editTitle">
+      </div>
+      <div class="form-group">
+        <label>תוכן</label>
+        <textarea id="editContent"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" onclick="saveEdit()">שמור</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const API = '';
+    let editingId = null;
+
+    // ===== API Calls =====
+
+    async function fetchNews() {
+      try {
+        const res = await fetch(`${API}/api/news/all`);
+        const data = await res.json();
+        renderNewsList(data);
+        updateStatus(data);
+        updateTicker(data);
+        return data;
+      } catch (err) {
+        console.error('Error:', err);
+        showToast('שגיאה בטעינת מבזקים', true);
+      }
+    }
+
+    async function fetchIVR() {
+      try {
+        const res = await fetch(`${API}/ivr`);
+        const text = await res.text();
+        document.getElementById('ivrOutput').textContent = text;
+
+        const previewRes = await fetch(`${API}/ivr/preview`);
+        const preview = await previewRes.json();
+        renderIVRStats(preview);
+      } catch (err) {
+        document.getElementById('ivrOutput').textContent = 'שגיאה בטעינה';
+      }
+    }
+
+    async function publishNews() {
+      const title = document.getElementById('newsTitle').value.trim();
+      const content = document.getElementById('newsContent').value.trim();
+
+      if (!title || !content) {
+        showToast('יש למלא כותרת ותוכן', true);
+        return;
+      }
+
+      const btn = document.getElementById('publishBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ מפרסם...';
+
+      try {
+        const res = await fetch(`${API}/api/news`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content })
+        });
+
+        if (res.ok) {
+          document.getElementById('newsTitle').value = '';
+          document.getElementById('newsContent').value = '';
+          showToast('מבזק פורסם בהצלחה! ⚡');
+          await fetchNews();
+          if (document.querySelector('[data-tab="ivr"]').classList.contains('active')) {
+            fetchIVR();
+          }
+        } else {
+          showToast('שגיאה בפרסום', true);
+        }
+      } catch (err) {
+        showToast('שגיאה בחיבור לשרת', true);
+      }
+
+      btn.disabled = false;
+      btn.textContent = '⚡ פרסם מבזק';
+    }
+
+    async function deleteNews(id) {
+      if (!confirm('למחוק את המבזק?')) return;
+
+      try {
+        await fetch(`${API}/api/news/${id}`, { method: 'DELETE' });
+        showToast('מבזק נמחק');
+        fetchNews();
+      } catch (err) {
+        showToast('שגיאה במחיקה', true);
+      }
+    }
+
+    async function toggleNews(id, currentActive) {
+      try {
+        await fetch(`${API}/api/news/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ is_active: !currentActive })
+        });
+        showToast(currentActive ? 'מבזק הושבת' : 'מבזק הופעל');
+        fetchNews();
+      } catch (err) {
+        showToast('שגיאה', true);
+      }
+    }
+
+    function openEdit(id, title, content) {
+      editingId = id;
+      document.getElementById('editTitle').value = title;
+      document.getElementById('editContent').value = content;
+      document.getElementById('editModal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('open');
+      editingId = null;
+    }
+
+    async function saveEdit() {
+      if (!editingId) return;
+      const title = document.getElementById('editTitle').value.trim();
+      const content = document.getElementById('editContent').value.trim();
+
+      if (!title || !content) {
+        showToast('יש למלא את כל השדות', true);
+        return;
+      }
+
+      try {
+        await fetch(`${API}/api/news/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, content })
+        });
+        showToast('מבזק עודכן');
+        closeModal();
+        fetchNews();
+      } catch (err) {
+        showToast('שגיאה בעדכון', true);
+      }
+    }
+
+    // ===== Rendering =====
+
+    function renderNewsList(items) {
+      const container = document.getElementById('newsList');
+
+      if (!items.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">📡</div>
+            <p>אין מבזקים עדיין — פרסם את הראשון!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="news-card ${item.is_active ? '' : 'inactive'}">
+          <div class="news-meta">
+            <span class="news-time">🕐 ${item.time}</span>
+            <div class="news-actions">
+              <button onclick="toggleNews(${item.id}, ${item.is_active})">
+                ${item.is_active ? '⏸ השבת' : '▶ הפעל'}
+              </button>
+              <button onclick="openEdit(${item.id}, '${escapeAttr(item.title)}', '${escapeAttr(item.content)}')">✏️ ערוך</button>
+              <button class="delete" onclick="deleteNews(${item.id})">🗑 מחק</button>
+            </div>
+          </div>
+          <div class="news-title">${escapeHtml(item.title)}</div>
+          <div class="news-content">${escapeHtml(item.content)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderIVRStats(preview) {
+      const container = document.getElementById('ivrStats');
+      const outputLen = preview.raw_output.length;
+      container.innerHTML = `
+        <div class="ivr-stat">מבזקים: <strong>${preview.news_count}</strong></div>
+        <div class="ivr-stat">אורך פלט: <strong>${outputLen}</strong> תווים</div>
+        <div class="ivr-stat">סטטוס: <strong style="color: var(--green)">תקין</strong></div>
+      `;
+    }
+
+    function updateStatus(data) {
+      const activeCount = data.filter(d => d.is_active).length;
+      document.getElementById('newsCount').textContent = `${activeCount} מבזקים פעילים`;
+      document.getElementById('lastUpdate').textContent = `עדכון: ${new Date().toLocaleTimeString('he-IL')}`;
+    }
+
+    function updateTicker(data) {
+      const active = data.filter(d => d.is_active);
+      if (active.length) {
+        const tickerText = active.map(n => `⚡ ${n.title}`).join('  ●  ');
+        document.getElementById('tickerContent').textContent = tickerText + '  ●  ' + tickerText;
+      }
+    }
+
+    function renderEndpoints() {
+      const base = window.location.origin;
+      const container = document.getElementById('endpointsGrid');
+      container.innerHTML = `
+        <div class="endpoint-card">
+          <h3>📡 API — מבזקים (JSON)</h3>
+          <div class="endpoint-url">GET ${base}/api/news</div>
+          <div class="endpoint-desc">מחזיר רשימת מבזקים פעילים בפורמט JSON</div>
+        </div>
+        <div class="endpoint-card">
+          <h3>📞 IVR — ימות המשיח</h3>
+          <div class="endpoint-url">GET ${base}/ivr</div>
+          <div class="endpoint-desc">פלט text/plain בפורמט id_list_message</div>
+        </div>
+        <div class="endpoint-card">
+          <h3>🔍 IVR — תצוגה מקדימה</h3>
+          <div class="endpoint-url">GET ${base}/ivr/preview</div>
+          <div class="endpoint-desc">JSON עם פירוט הניקוי והפלט</div>
+        </div>
+        <div class="endpoint-card">
+          <h3>📋 API — כל המבזקים</h3>
+          <div class="endpoint-url">GET ${base}/api/news/all</div>
+          <div class="endpoint-desc">כולל מבזקים לא פעילים (לפאנל ניהול)</div>
+        </div>
+      `;
+    }
+
+    // ===== Tabs =====
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+      document.getElementById('listTab').style.display = tab === 'list' ? '' : 'none';
+      document.getElementById('ivrTab').style.display = tab === 'ivr' ? '' : 'none';
+      document.getElementById('apiTab').style.display = tab === 'api' ? '' : 'none';
+
+      if (tab === 'ivr') fetchIVR();
+      if (tab === 'api') renderEndpoints();
+    }
+
+    // ===== Utils =====
+
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(str) {
+      return str.replace(/'/g, "\\'").replace(/"/g, '\\"').replace(/\n/g, ' ');
+    }
+
+    // Keyboard shortcut
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        publishNews();
+      }
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // ===== Init =====
+    fetchNews();
+    // Auto-refresh every 30 seconds
+    setInterval(fetchNews, 30000);
+  </script>
+</body>
+</html>
