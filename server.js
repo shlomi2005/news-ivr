@@ -58,10 +58,8 @@ app.post('/api/news', async (req, res) => {
     let yemotResult = null;
     try {
       const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
       const cleanContent = cleanTextForIVR(content);
-      const ttsText = `${hours}:${minutes} בחדשותינו ${cleanContent}`;
+      const ttsText = cleanContent;
       yemotResult = await publishToYemot(ttsText);
       console.log('📞 ימות המשיח:', yemotResult);
     } catch (yemotErr) {
